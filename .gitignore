@@ -104,6 +104,8 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.vscode/
+fintech/
 env/
 venv/
 ENV/
