@@ -76,17 +76,21 @@ class P2PTransferSerializer(serializers.Serializer):
                 'message' : 'You do not have enough balance to perform this transaction',
                 'balance' : None 
                 }
-        else:
-            sending_wallet.balance =(sending_wallet.balance - amount)
-            receiving_wallet.balance = (receiving_wallet.balance + amount)
-            sending_wallet.save()
-            receiving_wallet.save()
-            TransactionHistory.objects.create(source=sending_wallet, trans_type='debit', amount=amount, receiver_or_sender=receiving_wallet.owner, details=detail )
-            TransactionHistory.objects.create(source=receiving_wallet, trans_type='credit', amount=amount, receiver_or_sender=sending_wallet.owner, details=detail )
+        if amount <= 0:
             return {
+                'message' : 'Enter a Valid Amount ',
+                'balance' : None 
+                }
+        sending_wallet.balance =(sending_wallet.balance - amount)
+        receiving_wallet.balance = (receiving_wallet.balance + amount)
+        sending_wallet.save()
+        receiving_wallet.save()
+        TransactionHistory.objects.create(source=sending_wallet, trans_type='debit', amount=amount, receiver_or_sender=receiving_wallet.owner, details=detail )
+        TransactionHistory.objects.create(source=receiving_wallet, trans_type='credit', amount=amount, receiver_or_sender=sending_wallet.owner, details=detail )
+        return {
             'message' : 'Transfer successful',
             'balance' : sending_wallet.balance
-            }
+        }
 
 
     def validate(self, data):
