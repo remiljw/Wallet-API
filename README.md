@@ -57,13 +57,13 @@ API built with DRF for a telemedicine app to book hospital appointments.
  ```json
     payload = {
         "receiver": "test18@test.com",
-        "amount": 100,
+        "amount": 1000,
         "detail": "eat spaghetti"
     }
 
     response = {
         "message": "Transfer successful",
-        "balance": "900.00"
+        "balance": "9000.00"
     }
  ```
  
