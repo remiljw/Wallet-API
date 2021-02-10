@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .payments import flutter_wave
 from django.contrib.auth.models import update_last_login
 from .models import Wallet, TransactionHistory
 from django.contrib.auth import get_user_model, authenticate
@@ -68,18 +69,18 @@ class P2PTransferSerializer(serializers.Serializer):
         receiving_wallet  = Wallet.objects.get(owner = get_user)
         if receiving_wallet == sending_wallet:
             return { 
+                'status' : 'error',
                 'message' : 'You cannot transfer money to your self',
-                'balance' : None 
                 }
         if amount > sending_wallet.balance:
             return {
+                'status' : 'error',
                 'message' : 'You do not have enough balance to perform this transaction',
-                'balance' : None 
                 }
         if amount <= 0:
             return {
-                'message' : 'Enter a Valid Amount ',
-                'balance' : None 
+                'status' : 'error',
+                'message' : 'Enter a Valid Amount',
                 }
         sending_wallet.balance =(sending_wallet.balance - amount)
         receiving_wallet.balance = (receiving_wallet.balance + amount)
@@ -88,6 +89,7 @@ class P2PTransferSerializer(serializers.Serializer):
         TransactionHistory.objects.create(source=sending_wallet, trans_type='debit', amount=amount, receiver_or_sender=receiving_wallet.owner, details=detail )
         TransactionHistory.objects.create(source=receiving_wallet, trans_type='credit', amount=amount, receiver_or_sender=sending_wallet.owner, details=detail )
         return {
+            'status' : 'success',
             'message' : 'Transfer successful',
             'balance' : sending_wallet.balance
         }
@@ -99,10 +101,14 @@ class P2PTransferSerializer(serializers.Serializer):
         detail = data.get("detail", None)
         sender = self.context['request'].user
         transfer = self.transfer(sender, receiver, amount, detail)
-        
-        return {
+        if transfer['status'] == 'success':
+            return {
+                'message' : transfer['message'],
+                'balance' : transfer['balance']
+            }
+        else:
+            return  {
             'message' : transfer['message'],
-            'balance' : transfer['balance']
             }
 
 
@@ -113,11 +119,6 @@ class FundWalletSerializer(serializers.Serializer):
     balance = serializers.DecimalField(max_digits=10, decimal_places=2,read_only=True)
 
     def fund_wallet(self, amount, receiver):
-        if amount <= 0:
-            return {
-                'message': 'Input a valid amount',
-                'balance': None
-            }
         receiving_wallet = Wallet.objects.get(owner=receiver)
         receiving_wallet.balance = (receiving_wallet.balance + amount)
         receiving_wallet.save()
@@ -130,11 +131,20 @@ class FundWalletSerializer(serializers.Serializer):
     def validate(self, data):
         amount = data.get("amount", None)
         receiver = self.context['request'].user
-        fund_wallet = self.fund_wallet(amount, receiver)
-        return {
-            'message' : fund_wallet['message'],
-            'balance' : fund_wallet['balance'],
-        }
+        payment = flutter_wave(amount, receiver.email)
+
+        if payment["status"] == "error":
+            return {
+                'message': payment["error"]["errMsg"] 
+                }
+        if payment["status"] == "success":
+            amount = Decimal(payment["success"]["amount"])
+            fund_wallet = self.fund_wallet(amount, receiver)
+            return {  
+                    'message' : fund_wallet['message'], 
+                    'balance' : fund_wallet['balance']
+                }
+            
 
 
 class TransactionHistorySerializer(serializers.ModelSerializer):
