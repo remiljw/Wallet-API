@@ -21,7 +21,8 @@ API built with DRF for simple transactional wallets(NGN).
       "email" : "test@test.com",
       "password" : "iamapatient"
        } 
-
+```
+```json
     response = {
         "email" : "test@test.com",
         "wallet" : "7598797786"
@@ -34,6 +35,8 @@ API built with DRF for simple transactional wallets(NGN).
                 "email" : "test@test.com",
                 "password" : "iamapatient"
                }
+```
+```json              
   response = {
                 "email" : "test@test.com",
                 "token" : "jwt_token"
@@ -48,7 +51,8 @@ API built with DRF for simple transactional wallets(NGN).
    payload = { 
        "amount" :  10000
     }
-
+```
+```json
     response = {
         "message" : "Wallet Funded", 
         "balance" : "10000.00"
@@ -63,6 +67,8 @@ API built with DRF for simple transactional wallets(NGN).
         "amount": 1000,
         "detail": "eat spaghetti"
     }
+```
+```json
 
     response = {
         "message": "Transfer successful",
