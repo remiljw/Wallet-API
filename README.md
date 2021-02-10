@@ -77,7 +77,7 @@ API built with DRF for a telemedicine app to book hospital appointments.
             "source": "7598797786",
             "reference_number": "a9745f02-af70-4fdf-a46d-9ad8d8dc87f4",
             "trans_type": "debit",
-            "amount": "100.00",
+            "amount": "1000.00",
             "time": "2021-02-10T15:10:17.001086Z",
             "receiver_or_sender": "test18@test.com",
             "details": "eat spaghetti"
