@@ -1,39 +1,62 @@
 from rest_framework import serializers
-from .models import User, Wallet, Transaction_History
+from django.contrib.auth.models import update_last_login
+from .models import Wallet, Transaction_History
+from django.contrib.auth import get_user_model, authenticate
+from rest_framework_jwt.settings import api_settings
+
+User = get_user_model()
+JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
+JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 
 class SignUpSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta: 
         model = User
         fields = ('email', 'password')
         extra_kwargs = {'password' : {'write_only' : True}}
 
         def create(self, validated_data):
             user = User.objects.create_user(**validated_data)
-            return user
+            wallet = Wallet.objects.create(owner=user)
+            return { 'user': user, 'wallet': wallet}
 
-class CreateWalletSerializer(serializers.ModelSerializer):
-    owner = serializers.SlugRelatedField(slug_field='email', read_only=True)
-    # balance = serializers.SlugField(default=0.0)
-    class Meta:
-        model = Wallet
-        fields = ('owner',)
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.CharField(max_length=255)
+    password = serializers.CharField(max_length=128, write_only=True)
+    token = serializers.CharField(max_length=255, read_only=True)
 
-        # def create(self, validated_data):
-        #     new_wallet = Wallet.objects.get_or_create(**validated_data)
-        #     return new_wallet
-
+    def validate(self, data):
+        email = data.get("email", None)
+        password = data.get("password", None)
+        user = authenticate(email=email, password=password)
+        if user is None:
+            raise serializers.ValidationError(
+                'A user with this email and password is not found.'
+            )
+        try:
+            payload = JWT_PAYLOAD_HANDLER(user)
+            jwt_token = JWT_ENCODE_HANDLER(payload)
+            update_last_login(None, user)
+        except User.DoesNotExist:
+            raise serializers.ValidationError(
+                'User with given email and password does not exists'
+            )
+        return {
+            'email':user.email,
+            'token': jwt_token
+        }
 
 class P2PTransferSerializer(serializers.Serializer):
-    receiver = serializers.CharField(max_length=10, write_only=True)
+    receiver = serializers.EmailField(write_only=True)
     amount = serializers.FloatField(write_only=True) 
-    detail = serializers.CharField(max_length=255, write_only=True)
-    sender = serializers.CharField(max_length=255, read_only=True)
+    detail = serializers.CharField(write_only=True)
+    sender = serializers.CharField(read_only=True)
     message = serializers.CharField(read_only=True) 
 
     def transfer(self, sender, receiver, amount, detail):
         money =  float(amount)
         sending = Wallet.objects.get(owner = sender)
-        receiving  = Wallet.objects.get(account_no= receiver)
+        rec_user = User.objects.get(email=receiver)
+        receiving  = Wallet.objects.get(owner = rec_user)
         if money > sending.balance:
             return "You do not have enough balance to perform this transaction"
         else:

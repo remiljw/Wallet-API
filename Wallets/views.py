@@ -2,9 +2,9 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from .models import User, Wallet, Transaction_History
-from .serializers import CreateWalletSerializer, P2PTransferSerializer, SignUpSerializer, TransactionHistorySerializer, FundWalletSerializer
+from .serializers import P2PTransferSerializer, SignUpSerializer, TransactionHistorySerializer, FundWalletSerializer, UserLoginSerializer
 
 
 # Create your views here.
@@ -19,19 +19,22 @@ class SignUpView(CreateAPIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class CreateWalletView(CreateAPIView):
-    serializer_class = CreateWalletSerializer
-    permission_classes = (IsAuthenticated,)
+class UserLoginView(RetrieveAPIView):
+
+    serializer_class = UserLoginSerializer
+    permission_classes = (AllowAny,)
+
+    def get_queryset(self):
+        pass
+
+    def get_object(self):
+        pass
 
     def post(self, request):
-        user = {
-            'owner': request.user
-        }
-        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(owner = request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
+        status_code = status.HTTP_200_OK
+        return Response(serializer.data, status=status_code)
 
 class P2PTransferView(CreateAPIView):
     serializer_class = P2PTransferSerializer

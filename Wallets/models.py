@@ -10,7 +10,7 @@ TRANSACTION_TYPE = (
 def create_no():
     return str(random.randint(7500000001, 7599999999))
 class UserAccountManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, email, password, **extra_fields):
         if not email:
             raise ValueError("User must have an email address")
         user = self.model(email = self.normalize_email(email))
@@ -37,7 +37,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    USERNAME_FIELD = "email"
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     objects = UserAccountManager()
@@ -46,8 +46,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
     
 class Wallet(models.Model):
-    account_no = models.CharField(max_length=10, blank=True, editable=False, unique=True, default=create_no())
     owner = models.OneToOneField(User, on_delete=models.CASCADE)
+    account_no = models.CharField(max_length=10, blank=True, editable=False, unique=True, default=create_no())
     balance = models.FloatField(default=0.0)
 
     def __str__(self):
@@ -58,7 +58,7 @@ class Transaction_History(models.Model):
     reference_number = models.UUIDField(default=uuid.uuid4, editable=False)
     source = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     trans_type = models.CharField(max_length=7, choices=TRANSACTION_TYPE)
-    amount  = models.FloatField(default=0.0)
+    amount  = models.DecimalField(max_digits=10, decimal_places=2,  default=0.00)
     time = models.DateField(auto_now_add=True)
     receiver_or_sender = models.CharField(max_length=255)
     details = models.CharField(max_length=255)
