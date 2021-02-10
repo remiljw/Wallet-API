@@ -48,7 +48,7 @@ API built with DRF for a telemedicine app to book hospital appointments.
 
     response = {
         "message" : "Wallet Funded", 
-        "balance" : 10000.00
+        "balance" : "10000.00"
     }
  ```
  
