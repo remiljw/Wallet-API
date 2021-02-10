@@ -26,7 +26,7 @@ SECRET_KEY = '_)j8wcf(7fn1yn8a=dq7*4k87-cddd&cb77d2z_sbfx%nplp5x'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['wallets-apii.herokuapp.com']
 
 
 # Application definition
