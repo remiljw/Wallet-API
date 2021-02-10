@@ -109,6 +109,11 @@ class FundWalletSerializer(serializers.Serializer):
     balance = serializers.DecimalField(max_digits=10, decimal_places=2,read_only=True)
 
     def fund_wallet(self, amount, receiver):
+        if amount <= 0:
+            return {
+                'message': 'Input a valid amount',
+                'balance': None
+            }
         receiving_wallet = Wallet.objects.get(owner=receiver)
         receiving_wallet.balance = (receiving_wallet.balance + amount)
         receiving_wallet.save()
