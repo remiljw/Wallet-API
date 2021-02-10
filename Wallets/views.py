@@ -60,3 +60,11 @@ class GetTransactionHistoryView(ListAPIView):
 class FundWalletView(CreateAPIView):
     serializer_class = FundWalletSerializer
     permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        success_message = {
+            'message' : serializer.data['message']
+        }
+        return Response(success_message, status=status.HTTP_202_ACCEPTED)
