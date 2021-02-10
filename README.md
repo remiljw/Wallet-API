@@ -1,8 +1,12 @@
 # Wallet-API
 
-API built with DRF for a telemedicine app to book hospital appointments.
+API built with DRF for simple transactional wallets(NGN).
 
-## Authentication
+### NOTE
+- Data used in this documentations are just samples of response you would get when you query the API accordingly.
+- THEY ARE NOT REAL DATA.
+
+### Authentication
 - All end points need authentication to access except `/signin/` and `/signup/`.
 - Get your token from the `/signin/` endpoint, after you have signed up and add it to the request headers.
 ```python
@@ -10,18 +14,17 @@ API built with DRF for a telemedicine app to book hospital appointments.
 ```
 - You are good to go. 👍🏾
 ## Endpoints
-
 ### https://wallets-apii.herokuapp.com/api/signup/
 - Anyone can access this endpoint, it is meant to register new users into the system. 
 ```json
    payload =  { 
-      "email" : "test@test.com" ,
-      "password" : "iamapatient",
+      "email" : "test@test.com",
+      "password" : "iamapatient"
        } 
 
     response = {
-        "email" : "test@test.com" ,
-        "wallet" : "7598797786",
+        "email" : "test@test.com",
+        "wallet" : "7598797786"
     }
  ```
  ### https://wallets-apii.herokuapp.com/api/signin/
@@ -67,7 +70,7 @@ API built with DRF for a telemedicine app to book hospital appointments.
     }
  ```
  
- ### https://telemed-api.herokuapp.com/api/transactions/
+ ### https://walletsapii.herokuapp.com/api/transactions/
  - Returns all wallet transacrtion of the user.
 ```json
     response = {
