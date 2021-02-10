@@ -39,7 +39,7 @@ API built with DRF for simple transactional wallets(NGN).
 ```json              
   response = {
                 "email" : "test@test.com",
-                "token" : "jwt_token"
+                "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiOTdlODk5OTYtNzJlZC00ZTk4LTkxZmUtNTliMTRmYjMwNjk1IiwidXNlcm5hbWUiOiJtaWNhamFAZ21haWwuY29tIiwiZXhwIjoxNjE0NDU3NTE4LCJlbWFpbCI6Im1pY2FqYUBnbWFpbC5jb20ifQ.Kzb3TUIipqgyVKCE4Szs8GT_ldnaeOlNigufjNjNSaUn"
              }
  ```
  
