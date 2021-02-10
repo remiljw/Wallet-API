@@ -1,6 +1,6 @@
 from rave_python import Rave, RaveExceptions, Misc
 from decimal import Decimal
-rave = Rave("FLWPUBK_TEST-3e1196bf3d029441d022fe686e6a9716-X")
+rave = Rave("FLWPUBK_TEST-3e1196bf3d029441d022fe686e6a9716-X",  "FLWSECK_TEST-785ae3012dac826d1f1a38949f62dc78-X", usingEnv=False)
 
 def flutter_wave(amount, email):
     # Payload with pin
