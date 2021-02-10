@@ -64,7 +64,7 @@ class Transaction_History(models.Model):
     details = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.reference_number
+        return str(self.reference_number)
     
 
 
