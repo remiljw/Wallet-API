@@ -53,7 +53,7 @@ class P2PTransferSerializer(serializers.Serializer):
     message = serializers.CharField(read_only=True) 
 
     def transfer(self, sender, receiver, amount, detail):
-        money =  float(amount)
+        money =  amount
         sending = Wallet.objects.get(owner = sender)
         rec_user = User.objects.get(email=receiver)
         receiving  = Wallet.objects.get(owner = rec_user)
@@ -88,7 +88,7 @@ class FundWalletSerializer(serializers.Serializer):
     message = serializers.CharField(read_only=True)
 
     def fund_wallet(self, amount, sender):
-        money =  float(amount)
+        money = amount
         sending = Wallet.objects.get(owner = sender)
         sending.balance = float("%f" % (sending.balance + money))
         sending.save()
