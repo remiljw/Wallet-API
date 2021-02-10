@@ -1,23 +1,32 @@
 from rest_framework import serializers
 from django.contrib.auth.models import update_last_login
-from .models import Wallet, Transaction_History
+from .models import Wallet, TransactionHistory
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework_jwt.settings import api_settings
+from django.shortcuts import get_object_or_404
+from decimal import Decimal
 
 User = get_user_model()
 JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
 JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 
 class SignUpSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(max_length=255)
+    # Ensure passwords are at least 8 characters long, no longer than 128 characters, and can not be read by the client.
+    password = serializers.CharField(max_length=128, min_length=8, write_only=True)
+    wallet = serializers.CharField(read_only=True)
     class Meta: 
         model = User
-        fields = ('email', 'password')
-        extra_kwargs = {'password' : {'write_only' : True}}
+        fields = ('email', 'password', 'wallet',)
+        
 
-        def create(self, validated_data):
-            user = User.objects.create_user(**validated_data)
-            wallet = Wallet.objects.create(owner=user)
-            return { 'user': user, 'wallet': wallet}
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        wallet = Wallet.objects.create(owner=user)
+        return {
+            'email' : user.email,
+            'wallet' : wallet
+        }
 
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.CharField(max_length=255)
@@ -47,28 +56,37 @@ class UserLoginSerializer(serializers.Serializer):
 
 class P2PTransferSerializer(serializers.Serializer):
     receiver = serializers.EmailField(write_only=True)
-    amount = serializers.FloatField(write_only=True) 
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, write_only=True) 
     detail = serializers.CharField(write_only=True)
     sender = serializers.CharField(read_only=True)
     message = serializers.CharField(read_only=True) 
+    balance = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
     def transfer(self, sender, receiver, amount, detail):
-        money =  amount
-        sending = Wallet.objects.get(owner = sender)
-        rec_user = User.objects.get(email=receiver)
-        receiving  = Wallet.objects.get(owner = rec_user)
-        if receiving == sending:
-            return "You cannot transfer money to your self"
-        if money > sending.balance:
-            return "You do not have enough balance to perform this transaction"
+        sending_wallet = Wallet.objects.get(owner=sender)
+        get_user = get_object_or_404(User, email=receiver)
+        receiving_wallet  = Wallet.objects.get(owner = get_user)
+        if receiving_wallet == sending_wallet:
+            return { 
+                'message' : 'You cannot transfer money to your self',
+                'balance' : None 
+                }
+        if amount > sending_wallet.balance:
+            return {
+                'message' : 'You do not have enough balance to perform this transaction',
+                'balance' : None 
+                }
         else:
-            sending.balance = float("%f" % (sending.balance - money))
-            receiving.balance = float("%f" % (receiving.balance + money))
-            sending.save()
-            receiving.save()
-            Transaction_History.objects.create(source=sending, trans_type='debit', amount=money, receiver_or_sender=receiving.owner, details=detail )
-            Transaction_History.objects.create(source=receiving, trans_type='credit', amount=money, receiver_or_sender=sending.owner, details=detail )
-            return "Transfer Successful"
+            sending_wallet.balance =(sending_wallet.balance - amount)
+            receiving_wallet.balance = (receiving_wallet.balance + amount)
+            sending_wallet.save()
+            receiving_wallet.save()
+            TransactionHistory.objects.create(source=sending_wallet, trans_type='debit', amount=amount, receiver_or_sender=receiving_wallet.owner, details=detail )
+            TransactionHistory.objects.create(source=receiving_wallet, trans_type='credit', amount=amount, receiver_or_sender=sending_wallet.owner, details=detail )
+            return {
+            'message' : 'Transfer successful',
+            'balance' : sending_wallet.balance
+            }
 
 
     def validate(self, data):
@@ -76,36 +94,43 @@ class P2PTransferSerializer(serializers.Serializer):
         amount = data.get("amount", None)
         detail = data.get("detail", None)
         sender = self.context['request'].user
+        transfer = self.transfer(sender, receiver, amount, detail)
         
         return {
-            'message' : self.transfer(sender, receiver, amount, detail)
+            'message' : transfer['message'],
+            'balance' : transfer['balance']
             }
 
 
 class FundWalletSerializer(serializers.Serializer):
-    amount = serializers.FloatField(write_only=True)
-    sender = serializers.CharField(read_only=True)
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, write_only=True)
+    receiver = serializers.CharField(read_only=True)
     message = serializers.CharField(read_only=True)
+    balance = serializers.DecimalField(max_digits=10, decimal_places=2,read_only=True)
 
-    def fund_wallet(self, amount, sender):
-        money = amount
-        sending = Wallet.objects.get(owner = sender)
-        sending.balance = float("%f" % (sending.balance + money))
-        sending.save()
-        Transaction_History.objects.create(source=sending, trans_type='fund_wallet', amount=money, receiver_or_sender=sending.owner, details='Fund Wallet')
-        return "Wallet Funded"
+    def fund_wallet(self, amount, receiver):
+        receiving_wallet = Wallet.objects.get(owner=receiver)
+        receiving_wallet.balance = (receiving_wallet.balance + amount)
+        receiving_wallet.save()
+        TransactionHistory.objects.create(source=receiving_wallet, trans_type='fund_wallet', amount=amount, receiver_or_sender=receiving_wallet.owner, details='Fund Wallet')
+        return {
+            'message' : 'Wallet Funded',
+            'balance' : receiving_wallet.balance
+        }
 
     def validate(self, data):
         amount = data.get("amount", None)
-        sender = self.context['request'].user
+        receiver = self.context['request'].user
+        fund_wallet = self.fund_wallet(amount, receiver)
         return {
-            'message' : self.fund_wallet(amount, sender)
+            'message' : fund_wallet['message'],
+            'balance' : fund_wallet['balance'],
         }
 
 
 class TransactionHistorySerializer(serializers.ModelSerializer):
     source = serializers.SlugRelatedField(slug_field='account_no', read_only=True)
     class Meta:
-        model = Transaction_History
+        model = TransactionHistory
         fields = ('__all__')
 

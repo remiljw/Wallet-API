@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
-from .models import User, Wallet, Transaction_History
+from .models import User, Wallet, TransactionHistory
 from .serializers import P2PTransferSerializer, SignUpSerializer, TransactionHistorySerializer, FundWalletSerializer, UserLoginSerializer
 
 
@@ -43,10 +43,7 @@ class P2PTransferView(CreateAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        success_message = {
-            'message' : serializer.data['message']
-        }
-        return Response(success_message, status=status.HTTP_201_CREATED) 
+        return Response(serializer.data, status=status.HTTP_201_CREATED) 
 
 class GetTransactionHistoryView(ListAPIView):
     serializer_class = TransactionHistorySerializer
@@ -54,7 +51,7 @@ class GetTransactionHistoryView(ListAPIView):
 
 
     def get_queryset(self):
-        history = Transaction_History.objects.filter(source=self.request.user.wallet)
+        history = TransactionHistory.objects.filter(source=self.request.user.wallet)
         return history.order_by('-time')
 
 class FundWalletView(CreateAPIView):
@@ -64,7 +61,4 @@ class FundWalletView(CreateAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        success_message = {
-            'message' : serializer.data['message']
-        }
-        return Response(success_message, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

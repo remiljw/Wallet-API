@@ -49,7 +49,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Wallet(models.Model):
     owner = models.OneToOneField(User, on_delete=models.CASCADE)
     account_no = models.CharField(max_length=10, blank=True, editable=False, unique=True, default=create_no())
-    balance = models.FloatField(default=0.0)
+    balance = models.DecimalField(max_digits=10, decimal_places=2,  default=0.00)
     date_created = models.DateTimeField(auto_now_add=True) 
     date_modified = models.DateTimeField(auto_now=True)
 
@@ -57,7 +57,7 @@ class Wallet(models.Model):
         return self.account_no
     
 
-class Transaction_History(models.Model):
+class TransactionHistory(models.Model):
     reference_number = models.UUIDField(default=uuid.uuid4, editable=False)
     source = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     trans_type = models.CharField(max_length=20, choices=TRANSACTION_TYPE)
