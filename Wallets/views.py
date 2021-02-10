@@ -51,11 +51,11 @@ class P2PTransferView(CreateAPIView):
 class GetTransactionHistoryView(ListAPIView):
     serializer_class = TransactionHistorySerializer
     permission_classes = (IsAuthenticated,)
-     
+
 
     def get_queryset(self):
         history = Transaction_History.objects.filter(source=self.request.user.wallet)
-        return history
+        return history.order_by('-time')
 
 class FundWalletView(CreateAPIView):
     serializer_class = FundWalletSerializer
