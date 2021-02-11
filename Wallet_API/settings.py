@@ -16,18 +16,29 @@ import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from dotenv import load_dotenv
+load_dotenv()
+
+# OR, the same with increased verbosity
+load_dotenv(verbose=True)
+
+# OR, explicitly providing path to '.env'
+from pathlib import Path  # Python 3.6+ only
+env_path = Path('.') / '.env'
+load_dotenv(dotenv_path=env_path)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '_)j8wcf(7fn1yn8a=dq7*4k87-cddd&cb77d2z_sbfx%nplp5x'
-
+SECRET_KEY = os.getenv('SECRET_KEY')
+FLW_PUB_KEY = os.getenv('RAVE_PUBLIC_KEY')
+FLW_SEC_KEY = os.getenv('RAVE_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['wallets-apii.herokuapp.com']
+ALLOWED_HOSTS = ['wallets-apii.herokuapp.com', 'localhost']
 
 
 # Application definition
