@@ -109,4 +109,4 @@ API built with DRF for simple transactional wallets(NGN).
 ```
 ## Miscellaneous
 
-You can also test via the browsable apis by clicking on the links, and login where necessary.
+You can also interact with endpoints via the browser by clicking on the links, and login after you have signed up.
