@@ -45,11 +45,11 @@ API built with DRF for simple transactional wallets(NGN).
  
  ### https://wallets-apii.herokuapp.com/api/fund-wallet/
  - User can fund wallets from here, just by stating the amount. 
+ -  Example: For 100, input `100`, for 10,000 input `10000`, for 100,000 input `100000`, for 10,500 input `10500`
  - Payment is processed by Flutterwave API, with a test card stored in the system to serve as the user's saved card. 
  - User is charged 3.8% of amount as transaction fee.
  - End point may take longer to respond as it needs to process payments.
- -  Example: For N100, type 100 
- -  For N100.50, type 100.50
+ 
  ```json
    payload = { 
        "amount" :  10000
