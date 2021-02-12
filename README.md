@@ -79,7 +79,7 @@ API built with DRF for simple transactional wallets(NGN).
     }
  ```
  
- ### https://walletsapii.herokuapp.com/api/transactions/
+ ### https://wallets-apii.herokuapp.com/api/transactions/
  - Returns all wallet transacrtion of the user.
 ```json
     response = {
