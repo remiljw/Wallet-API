@@ -9,7 +9,13 @@ TRANSACTION_TYPE = (
     ('fund_wallet', 'Fund Wallet')
 )
 def create_no():
-    return str(random.randint(7500000001, 7599999999))
+    existing_num =[]
+    num = str(random.randint(7500000001, 7599999999))
+    if num not in existing_num:
+        existing_num.append(num)
+        return num
+    return create_no()
+    
 class UserAccountManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         if not email:
