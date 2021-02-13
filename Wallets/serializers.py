@@ -16,14 +16,11 @@ class WalletSerializer(serializers.ModelSerializer):
         model = Wallet
         fields = ('account_no',)
 class SignUpSerializer(serializers.ModelSerializer): 
-    email = serializers.EmailField(max_length=255)
-    # Ensure passwords are at least 8 characters long, no longer than 128 characters, and can not be read by the client.
     password = serializers.CharField(max_length=128, min_length=8, write_only=True)
     wallet = WalletSerializer(read_only=True)
     class Meta: 
         model = User
-        fields = ('email', 'password', 'wallet',)
-        
+        fields = ('email', 'password', 'wallet',)      
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
