@@ -1,3 +1,4 @@
+import random
 from rest_framework import serializers
 from .payments import flutter_wave
 from django.contrib.auth.models import update_last_login
@@ -11,21 +12,27 @@ User = get_user_model()
 JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
 JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 
-class WalletSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Wallet
-        fields = ('account_no',)
+
 class SignUpSerializer(serializers.ModelSerializer): 
     password = serializers.CharField(max_length=128, min_length=8, write_only=True)
-    wallet = WalletSerializer(read_only=True)
+    wallet = serializers.CharField(read_only=True)
     class Meta: 
         model = User
-        fields = ('email', 'password', 'wallet',)      
+        fields = ('email', 'password', 'wallet',)
+
+    def create_no(self):
+        existing_num = Wallet.objects.values('account_no')
+        num = str(random.randint(7500000001, 7599999999))
+        for i in range(len(existing_num)):
+            if num not in existing_num[i]['account_no']:
+                return num
+            return create_no()
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
-        wallet = Wallet.objects.create(owner=user)
-        return user
+        wallet = Wallet.objects.create(owner=user, account_no=self.create_no())
+        return {'email': user.email,
+                'wallet': wallet }
 
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.CharField(max_length=255)

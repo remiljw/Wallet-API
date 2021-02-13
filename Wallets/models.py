@@ -1,4 +1,5 @@
-import uuid, random
+import uuid
+from .utils import create_no
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
@@ -8,14 +9,7 @@ TRANSACTION_TYPE = (
     ('debit', 'Debit'),
     ('fund_wallet', 'Fund Wallet')
 )
-def create_no():
-    existing_num =[]
-    num = str(random.randint(7500000001, 7599999999))
-    if num not in existing_num:
-        existing_num.append(num)
-        return num
-    return create_no()
-    
+
 class UserAccountManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         if not email:
@@ -23,7 +17,6 @@ class UserAccountManager(BaseUserManager):
         user = self.model(email = self.normalize_email(email))
         user.set_password(password)
         user.save(using=self._db)
-
         return user
 
     def create_superuser(self, email,  password, **extra_fields):
@@ -36,7 +29,6 @@ class UserAccountManager(BaseUserManager):
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
-        
         return user
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -51,7 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-    
+
 class Wallet(models.Model):
     owner = models.OneToOneField(User, on_delete=models.CASCADE)
     account_no = models.CharField(max_length=10, blank=True, editable=False, unique=True, default=create_no())
