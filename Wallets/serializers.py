@@ -24,7 +24,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         existing_num = Wallet.objects.values('account_no')
         num = str(random.randint(7500000001, 7599999999))
         for i in range(len(existing_num)):
-            if num not in existing_num[i]['account_no']:
+            if num !=  existing_num[i]['account_no']:
                 return num
             return create_no()
 
