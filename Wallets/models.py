@@ -3,11 +3,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 # Create your models here.
-TRANSACTION_TYPE = (
-    ('credit', 'Credit'),
-    ('debit', 'Debit'),
-    ('fund_wallet', 'Fund Wallet')
-)
 
 class UserAccountManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
@@ -55,16 +50,19 @@ class Wallet(models.Model):
     
 
 class TransactionHistory(models.Model):
+    CREDIT = 'credit'
+    DEBIT = 'debit'
+    FUND_WALLET =  'fund_wallet'
+    TRANSACTION_TYPE = ((CREDIT, 'Credit'),
+            (DEBIT, 'Debit'),
+            (FUND_WALLET, 'Fund Wallet'),)
     reference_number = models.UUIDField(default=uuid.uuid4, editable=False)
-    source = models.ForeignKey(Wallet, on_delete=models.CASCADE)
-    trans_type = models.CharField(max_length=20, choices=TRANSACTION_TYPE)
+    main = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name='trans_sender')
+    trans_type = models.CharField(max_length=1,choices=TRANSACTION_TYPE)
     amount  = models.DecimalField(max_digits=10, decimal_places=2,  default=0.00)
     time = models.DateTimeField(auto_now_add=True)
-    receiver_or_sender = models.CharField(max_length=255)
+    recipient = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name='trans_recipient')
     details = models.CharField(max_length=255)
 
     def __str__(self):
         return str(self.reference_number)
-    
-
-

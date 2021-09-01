@@ -133,3 +133,8 @@ dmypy.json
 stack.py
 seializer_test.py
 wallets.apii
+fintech
+tests.py
+mil.py
+lawyer.py
+fasta.py

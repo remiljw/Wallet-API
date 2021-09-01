@@ -1,15 +1,18 @@
-from django.shortcuts import render
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
-from .models import User, Wallet, TransactionHistory
-from .serializers import P2PTransferSerializer, SignUpSerializer, TransactionHistorySerializer, FundWalletSerializer, UserLoginSerializer
+from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
+from .models import TransactionHistory
+from .serializers import P2PTransferSerializer, SignUpSerializer, \
+    TransactionHistorySerializer, FundWalletSerializer, UserLoginSerializer
+from django.http import JsonResponse
 
 
 # Create your views here.
 
-class SignUpView(CreateAPIView):
+class SignUpView(APIView):
     serializer_class = SignUpSerializer
     permission_classes = (AllowAny,)
 
@@ -19,30 +22,25 @@ class SignUpView(CreateAPIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class UserLoginView(RetrieveAPIView):
+class UserLoginView(APIView):
 
     serializer_class = UserLoginSerializer
     permission_classes = (AllowAny,)
 
-    def get_queryset(self):
-        pass
-
-    def get_object(self):
-        pass
-
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        status_code = status.HTTP_200_OK
-        return Response(serializer.data, status=status_code)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-class P2PTransferView(CreateAPIView):
+class P2PTransferView(APIView):
     serializer_class = P2PTransferSerializer
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
+        if serializer.data['status'] == 'error':
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_201_CREATED) 
 
 class GetTransactionHistoryView(ListAPIView):
@@ -51,14 +49,18 @@ class GetTransactionHistoryView(ListAPIView):
 
 
     def get_queryset(self):
-        history = TransactionHistory.objects.filter(source=self.request.user.wallet)
+        user = self.request.user
+        history = TransactionHistory.objects.filter((Q(sender=user.owner_wallet) & (Q(trans_type="debit") | Q(trans_type="fund_wallet"))) 
+            | (Q(recipient=user.owner_wallet) & Q(trans_type="credit")))
         return history.order_by('-time')
 
-class FundWalletView(CreateAPIView):
+class FundWalletView(APIView):
     serializer_class = FundWalletSerializer
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
+        if serializer.data['status'] == 'error':
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
