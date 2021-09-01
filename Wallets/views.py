@@ -51,8 +51,8 @@ class GetTransactionHistoryView(ListAPIView):
     def get_queryset(self):
         user = Wallet.objects.get(owner=self.request.user)
 
-        history = TransactionHistory.objects.filter((Q(sender=user) & (Q(trans_type=TransactionHistory.DEBIT) | Q(trans_type=TransactionHistory.FUND_WALLET))) 
-            | (Q(recipient=user) & Q(trans_type=TransactionHistory.CREDIT)))
+        history = TransactionHistory.objects.filter((Q(sender=user) & (Q(trans_type=TransactionHistory.DEBIT) |
+                Q(trans_type=TransactionHistory.FUND_WALLET)))  | (Q(recipient=user) & Q(trans_type=TransactionHistory.CREDIT)))
         return history.order_by('-time')
 
 class FundWalletView(APIView):
