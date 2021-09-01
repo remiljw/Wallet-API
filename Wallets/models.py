@@ -57,8 +57,8 @@ class TransactionHistory(models.Model):
             (DEBIT, 'Debit'),
             (FUND_WALLET, 'Fund Wallet'),)
     reference_number = models.UUIDField(default=uuid.uuid4, editable=False)
-    main = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name='trans_sender')
-    trans_type = models.CharField(max_length=1,choices=TRANSACTION_TYPE)
+    sender = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name='trans_sender')
+    trans_type = models.CharField(max_length=20,choices=TRANSACTION_TYPE)
     amount  = models.DecimalField(max_digits=10, decimal_places=2,  default=0.00)
     time = models.DateTimeField(auto_now_add=True)
     recipient = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name='trans_recipient')

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
-from .models import TransactionHistory
+from .models import TransactionHistory, Wallet
 from .serializers import P2PTransferSerializer, SignUpSerializer, \
     TransactionHistorySerializer, FundWalletSerializer, UserLoginSerializer
 from django.http import JsonResponse
@@ -49,9 +49,10 @@ class GetTransactionHistoryView(ListAPIView):
 
 
     def get_queryset(self):
-        user = self.request.user
-        history = TransactionHistory.objects.filter((Q(sender=user.owner_wallet) & (Q(trans_type="debit") | Q(trans_type="fund_wallet"))) 
-            | (Q(recipient=user.owner_wallet) & Q(trans_type="credit")))
+        user = Wallet.objects.get(owner=self.request.user)
+
+        history = TransactionHistory.objects.filter((Q(sender=user) & (Q(trans_type=TransactionHistory.DEBIT) | Q(trans_type=TransactionHistory.FUND_WALLET))) 
+            | (Q(recipient=user) & Q(trans_type=TransactionHistory.CREDIT)))
         return history.order_by('-time')
 
 class FundWalletView(APIView):
@@ -63,4 +64,4 @@ class FundWalletView(APIView):
         serializer.is_valid(raise_exception=True)
         if serializer.data['status'] == 'error':
             return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
