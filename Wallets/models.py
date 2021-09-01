@@ -36,7 +36,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserAccountManager()
 
     def __str__(self):
-        return self.email
+        return str(self.email)
 
 class Wallet(models.Model):
     owner = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -46,7 +46,7 @@ class Wallet(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.account_no
+        return str(self.account_no)
     
 
 class TransactionHistory(models.Model):

@@ -90,8 +90,9 @@ class P2PTransferSerializer(serializers.Serializer):
                 'status' : 'error',
                 'message' : 'Enter a Valid Amount',
                 }
-        sending_wallet.balance =(sending_wallet.balance - amount)
-        recipient_wallet.balance = (recipient_wallet.balance + amount)
+        
+        sending_wallet.balance -= amount
+        recipient_wallet.balance += amount
         sending_wallet.save()
         recipient_wallet.save()
         TransactionHistory.objects.create(sender=sending_wallet, trans_type=TransactionHistory.DEBIT, amount=amount, recipient=recipient_wallet, details=detail )
@@ -131,7 +132,7 @@ class FundWalletSerializer(serializers.Serializer):
 
     def fund_wallet(self, amount, recipient):
         recipient_wallet = Wallet.objects.get(owner=recipient)
-        recipient_wallet.balance = (recipient_wallet.balance + amount)
+        recipient_wallet.balance += amount
         recipient_wallet.save()
         TransactionHistory.objects.create(sender=recipient_wallet, trans_type=TransactionHistory.FUND_WALLET, amount=amount, recipient=recipient_wallet, details='Fund Wallet')
         return {
