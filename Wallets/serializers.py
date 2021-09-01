@@ -21,14 +21,12 @@ class SignUpSerializer(serializers.ModelSerializer):
         fields = ('email', 'password', 'wallet',)
 
     def create_no(self):
-        existing_num = Wallet.objects.values('account_no')
-        num = str(random.randint(7500000001, 7599999999))
-        if len(existing_num) == 0:
-            return num
-        for i in range(len(existing_num)):
-            if num !=  existing_num[i]['account_no']:
-                return num
+        new_num = str(random.randint(7500000001, 7599999999))
+        try:
+            existing_num = Wallet.objects.get(account_no=new_num)
             return self.create_no()
+        except:
+            return new_num
 
 
     def create(self, validated_data):
