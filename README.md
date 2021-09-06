@@ -14,7 +14,7 @@ API built with DRF for simple transactional wallets(NGN).
 ```
 - You are good to go. 👍🏾
 ## Endpoints
-### https://wallets-apii.herokuapp.com/api/signup/
+### https://wallets-apii.herokuapp.com/wallets/signup
 - Anyone can access this endpoint, it is meant to register new users into the system. 
 ```json
    payload =  { 
@@ -25,10 +25,10 @@ API built with DRF for simple transactional wallets(NGN).
 ```json
     response = {
         "email" : "test@test.com",
-        "wallet" : "7598797786"
+        "wallet" : "7546589570"
     }
  ```
- ### https://wallets-apii.herokuapp.com/api/signin/
+ ### https://wallets-apii.herokuapp.com/wallets/signin
  - All users sign in here and get JWT tokens, which are used to access the remaining endpoints.
  ```json
   payload = {
@@ -43,7 +43,7 @@ API built with DRF for simple transactional wallets(NGN).
              }
  ```
  
- ### https://wallets-apii.herokuapp.com/api/fund-wallet/
+ ### https://wallets-apii.herokuapp.com/wallets/fund-wallet
  - User can fund wallets from here, just by stating the amount. 
  -  Example: For 100, input `100`, for 10,000 input `10000`, for 100,000 input `100000`, for 10,500 input `10500`
  - Payment is processed by Flutterwave API, with a test card stored in the system to serve as the user's saved card. 
@@ -52,22 +52,22 @@ API built with DRF for simple transactional wallets(NGN).
  
  ```json
    payload = { 
-       "amount" :  10000
+       "amount" :  1000
     }
 ```
 ```json
     response = {
         "message" : "Wallet Funded", 
-        "balance" : "10000.00"
+        "balance" : "1000.00"
     }
  ```
  
- ### https://wallets-apii.herokuapp.com/api/transfer/
+ ### https://wallets-apii.herokuapp.com/wallets/transfer
  -  User can transfer to other users in the system, just by specifying the user, the amount and detail.
  ```json
     payload = {
-        "receiver": "test18@test.com",
-        "amount": 1000,
+        "recipient": "test18@test.com",
+        "amount": 100,
         "detail": "eat spaghetti"
     }
 ```
@@ -75,34 +75,34 @@ API built with DRF for simple transactional wallets(NGN).
 
     response = {
         "message": "Transfer successful",
-        "balance": "9000.00"
+        "balance": "900.00"
     }
  ```
  
- ### https://wallets-apii.herokuapp.com/api/transactions/
+ ### https://wallets-apii.herokuapp.com/wallets/transactions
  - Returns all wallet transacrtion of the user.
 ```json
     response = {
         "results": [
             {
             "id": 2,
-            "source": "7598797786",
+            "sender": "7546589570",
+            "recipient": "7598797786",
             "reference_number": "a9745f02-af70-4fdf-a46d-9ad8d8dc87f4",
             "trans_type": "debit",
-            "amount": "1000.00",
+            "amount": "100.00",
             "time": "2021-02-10T15:10:17.001086Z",
-            "receiver_or_sender": "test18@test.com",
             "details": "eat spaghetti"
         },
         {
-            "id": 1,
-            "source": "7598797786",
-            "reference_number": "4c18b277-9c8b-4747-a142-449cd9f1e3ea",
-            "trans_type": "fund_wallet",
-            "amount": "10000.00",
-            "time": "2021-02-10T15:11:46.926753Z",
-            "receiver_or_sender": "test@test.com",
-            "details": "Fund Wallet"
+          "id": 9,
+          "sender": "7546589570",
+          "recipient": "7546589570",
+          "reference_number": "7937333c-8810-4aab-9583-1854a9840c97",
+          "trans_type": "fund_wallet",
+          "amount": "1000.00",
+          "time": "2021-09-06T16:35:48.931767Z",
+          "details": "Fund Wallet"
         }
         ]
     }
