@@ -165,7 +165,8 @@ SPECTACULAR_SETTINGS = {
                     <li> carry out p2p transfers </li>
                     <li> get transaction hsitory </li>
                     </ul>
-                    <a href='https://github.com/remiljw/Wallet-API'>Source code here</a>""",
+                    <a href='https://github.com/remiljw/Wallet-API'>Source code here</a>
+                    <br>You can test in-browser via Swagger <a href='/swagger/'>here</a>.""",
     'VERSION': '1.0.2',
     'CONTACT': {
         'name': 'Michael Iruobe Ajanaku',
