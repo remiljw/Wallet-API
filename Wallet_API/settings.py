@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Wallets',
     'rest_framework',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -150,8 +151,34 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 
         'rest_framework.pagination.LimitOffsetPagination',
         'PAGE_SIZE': 10,
-    
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Wallet API',
+    'DESCRIPTION': """<b>Sample Digital Wallet built with Django Rest Framework
+                    <br>Users will be able to:</b>
+                    <ul>
+                    <li> signup </li>
+                    <li> signin </li>
+                    <li> fund wallet </li>
+                    <li> carry out p2p transfers </li>
+                    <li> get transaction hsitory </li>
+                    </ul>
+                    <a href='https://github.com/remiljw/Wallet-API'>Source code here</a>""",
+    'VERSION': '1.0.2',
+    'CONTACT': {
+        'name': 'Michael Iruobe Ajanaku',
+        'email': 'micajanaku@outlook.com',
+        'url': 'https://micajanaku.vercel.app'
+    },
+    'LICENSE': {
+        'name': 'MIT License',
+        'url' : 'https://github.com/remiljw/Wallet-API/blob/master/LICENSE'
+    },
+    'COMPONENT_SPLIT_REQUEST': True,
+}
+
 
 JWT_AUTH = {
     'JWT_VERIFY': True,

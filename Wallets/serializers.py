@@ -64,7 +64,6 @@ class P2PTransferSerializer(serializers.Serializer):
     recipient = serializers.EmailField(write_only=True)
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, write_only=True) 
     detail = serializers.CharField(write_only=True)
-    sender = serializers.CharField(read_only=True)
     message = serializers.CharField(read_only=True) 
     status = serializers.CharField(read_only=True) 
     balance = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
@@ -123,7 +122,6 @@ class P2PTransferSerializer(serializers.Serializer):
 
 class FundWalletSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, write_only=True)
-    recipient = serializers.CharField(read_only=True)
     message = serializers.CharField(read_only=True)
     status = serializers.CharField(read_only=True) 
     balance = serializers.DecimalField(max_digits=10, decimal_places=2,read_only=True)
