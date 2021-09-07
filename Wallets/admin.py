@@ -6,7 +6,7 @@ from .models import User, Wallet, TransactionHistory
 class TransactionHistoryAdmin(admin.ModelAdmin):
     readonly_fields=("reference_number", "trans_type", "sender", "recipient", "amount", "details", "time")
     list_display = ("reference_number", "trans_type", "sender", "recipient", "amount", "time")
-    search_fields = ("trans_type", "sender__account_no", "recipient__account_no", "amount")
+    search_fields = ("trans_type", "sender__account_no", "sender__owner__email","recipient__account_no","recipient__owner__email", "amount")
     list_filter = ("trans_type",)
     list_per_page = 50
 
